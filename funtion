@@ -1,0 +1,123 @@
+  counterFuntion() {
+    this.setState((state) => ({
+      counterToggle: !state.counterToggle,
+    }));
+    if (this.state.counterIcon === "\u23F5") {
+      this.setState(() => ({
+        counterIcon: "\u23F8",
+      }));
+    }
+    if (this.state.counterIcon === "\u23F8") {
+      this.setState(() => ({
+        counterIcon: "\u23F5",
+      }));
+    }
+    this.setState(() => ({
+      resetToggle: false,
+    }));
+    this.coundown();
+  }
+  resetFuntion() {
+    this.setState(() => ({
+      resetToggle: true,
+      minuteValue: "25",
+      secondsValue: "00",
+      breakValue: 5,
+      sessionValue: 25,
+      timerLabel: "Session",
+      counterToggle: false,
+      counterIcon: "\u23F5",
+      iCounter: 0,
+    }));
+  }
+  coundown() {
+    let fixedTime = new Date("Jan 5, 2022 15:00:00").getTime();
+    let minutes = parseInt(this.state.minuteValue, 10);
+    if (!this.state.counterToggle) {
+      this.oneSecondInterval = setInterval(() => {
+        //Counter Instructions Block
+        let countDownSeconds = new Date(
+          "Jan 5, 2022 15:00:" + this.state.iCounter.toString(10)
+        ).getTime();
+        let distance = 59000 - countDownSeconds + fixedTime;
+        this.setState(() => ({
+          iCounter: this.state.iCounter + 1,
+        }));
+        if (distance === 59000) {
+          minutes--;
+        }
+        let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        if (this.state.iCounter === 61) {
+          this.setState(() => ({
+            iCounter: 1,
+          }));
+        }
+
+        //Change Cicle Length Instructions Block
+        if (
+          this.state.iCounter === 1 &&
+          minutes === -1 &&
+          this.state.timerLabel === "Session"
+        ) {
+          this.setState(() => ({
+            timerLabel: "Break",
+          }));
+          minutes = parseInt(this.state.breakValue, 10);
+          seconds = 0;
+          this.setState(() => ({
+            iCounter: 0,
+          }));
+        }
+        if (
+          this.state.iCounter === 1 &&
+          minutes === -1 &&
+          this.state.timerLabel === "Break"
+        ) {
+          this.setState(() => ({
+            timerLabel: "Session",
+          }));
+          minutes = parseInt(this.state.sessionValue, 10);
+          seconds = 0;
+          this.setState(() => ({
+            iCounter: 0,
+          }));
+        }
+
+        console.log(minutes+"m "+seconds+"s");
+        console.log("Label: "+this.state.timerLabel+", i: "+this.state.iCounter);
+
+        //Display Instructions Block
+        if (seconds < 10) {
+          this.setState(() => ({
+            secondsValue: "0" + seconds.toString(10),
+          }));
+        } else {
+          this.setState(() => ({
+            secondsValue: seconds.toString(10),
+          }));
+        }
+        if (minutes < 10) {
+          this.setState(() => ({
+            minuteValue: "0" + minutes.toString(10),
+          }));
+        } else {
+          this.setState(() => ({
+            minuteValue: minutes.toString(10),
+          }));
+        }
+
+        //Exit Instructions Block
+        if (!this.state.counterToggle) {
+          clearInterval(this.oneSecondInterval);
+        }
+        if (this.state.resetToggle) {
+          this.setState(() => ({
+            minuteValue: "25",
+            secondsValue: "00",
+            iCounter: 0,
+          }));
+          clearInterval(this.oneSecondInterval);
+        }
+      }, 1000);
+    }
+  }
